@@ -2,7 +2,7 @@
 {
     public class BloodBankEntry
     {
-       
+
 
         public int Id { get; set; }
         public string DonorName { get; set; }
@@ -12,7 +12,7 @@
         public decimal Quantity { get; set; }
         public DateTime CollectionDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string Status { get; set; }
+        public string GetBloodStatus { get; set; }
 
 
     }
