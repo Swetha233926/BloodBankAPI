@@ -14,7 +14,7 @@ namespace BloodBankAPI.Controllers
             new BloodBankEntry{Id=2,DonorName="Shirisha",Age=24,BloodType="B+",ContactInfo="Shirisha@gmail.com",Quantity=1,CollectionDate=Convert.ToDateTime("2024-11-20"),ExpirationDate=Convert.ToDateTime("2024-11-22"),Status="Requested"}
         };
 
-        //1. Get All Donors info
+        //1. Get All Donors information
         [HttpGet]
         public ActionResult<IEnumerable<BloodBankEntry>> GetAllDonors()
         {
