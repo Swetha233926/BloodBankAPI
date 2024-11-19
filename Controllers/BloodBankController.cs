@@ -14,7 +14,7 @@ namespace BloodBankAPI.Controllers
             new BloodBankEntry{Id=2,DonorName="Shirisha",Age=24,BloodType="B+",ContactInfo="Shirisha@gmail.com",Quantity=1,CollectionDate=Convert.ToDateTime("2024-11-20"),ExpirationDate=Convert.ToDateTime("2024-11-22"),GetBloodStatus="Available"}
         };
 
-        // Utility method to determine blood status
+        // Utility method to determine the blood status
         private string DetermineBloodStatus(BloodBankEntry donor)
         {
             if (donor.ExpirationDate < DateTime.Now)
