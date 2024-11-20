@@ -27,9 +27,8 @@ namespace BloodBankAPI.Controllers
                 return "Available";
             }
 
-            return "Requested"; // Default case if none of the above conditions are met
+            return "Requested"; 
         }
-
 
         // 1. Get All Donors information
         [HttpGet]
@@ -181,16 +180,32 @@ namespace BloodBankAPI.Controllers
         [HttpDelete("bulk")]
         public IActionResult DeleteDonors(List<int> ids)
         {
+            if (ids== null || !ids.Any())
+            {
+                return BadRequest("The list of donor IDs is empty.");
+            }
+
+            var donors_not_found = new List<int>();
             foreach (var id in ids)
             {
                 var donor = BloodDonors.Find(x => x.Id == id);
                 if (donor == null)
                 {
-                    return NotFound($"Donor with ID {id} not found.");
+                    donors_not_found.Add(id);
                 }
                 BloodDonors.Remove(donor);
             }
-            return NoContent();
+            if (donors_not_found.Any())
+            {
+                return Ok(new
+                {
+                    Message = "Some donors were not found.",
+                    NotFoundDonors = donors_not_found
+                });
+            }
+
+            return Ok("All donors were successfully deleted.");
+
         }
 
         //8. Pagination 
@@ -202,10 +217,15 @@ namespace BloodBankAPI.Controllers
         }
 
         //9. Search for blood bank entries based on blood type
-        [HttpGet("bloodtype/{bloodtype}")]
+        [HttpGet("Bloodtype")]
         public ActionResult<IEnumerable<BloodBankEntry>> GetDonorsByBloodType(string bloodtype)
         {
-            // Your existing logic
+            var validBloodTypes = new List<string> { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" };
+            if (!validBloodTypes.Contains(bloodtype, StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest("Enter the blood type correctly");
+            }
+
             List<BloodBankEntry> donors = BloodDonors.FindAll(x =>
                 string.Equals(x.BloodType, bloodtype, StringComparison.OrdinalIgnoreCase));
 
@@ -218,9 +238,14 @@ namespace BloodBankAPI.Controllers
         }
 
         //10. Search for blood bank entries by status
-        [HttpGet("status/{status}")]
+        [HttpGet("status")]
         public ActionResult<IEnumerable<BloodBankEntry>> GetDonorsByStatus(string status)
         {
+            var available_status = new List<string> {"Available","Requested","Expired"};
+            if (!available_status.Contains(status, StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest("Enter any of the following status {Available, Expired, Requested}");
+            }
             List<BloodBankEntry> donors = BloodDonors.FindAll(x => string.Equals(
                 x.GetBloodStatus, status, StringComparison.OrdinalIgnoreCase));
             if (donors.Count == 0)
@@ -231,11 +256,11 @@ namespace BloodBankAPI.Controllers
         }
 
         //11. Search for donors by Name
-        [HttpGet("Name/{Name}")]
+        [HttpGet("Name")]
         public ActionResult<IEnumerable<BloodBankEntry>> GetDonorsByName(string Name)
         {
             List<BloodBankEntry> donors = BloodDonors.FindAll(
-                x => string.Equals(x.DonorName, Name, StringComparison.OrdinalIgnoreCase)
+                x => string.Equals(x.DonorName.Trim(), Name.Trim(), StringComparison.OrdinalIgnoreCase)
                 );
             if (donors.Count == 0)
             {
