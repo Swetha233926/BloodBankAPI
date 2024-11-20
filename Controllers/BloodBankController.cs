@@ -21,8 +21,15 @@ namespace BloodBankAPI.Controllers
             {
                 return "Expired";
             }
-            return "Available";
+
+            if (donor.ExpirationDate > DateTime.Now && donor.GetBloodStatus != "Requested")
+            {
+                return "Available";
+            }
+
+            return "Requested"; // Default case if none of the above conditions are met
         }
+
 
         // 1. Get All Donors information
         [HttpGet]
@@ -55,9 +62,10 @@ namespace BloodBankAPI.Controllers
                 b.Quantity <= 0 ||
                 string.IsNullOrEmpty(b.ContactInfo) ||
                 b.ExpirationDate == default ||
+                b.ExpirationDate<b.CollectionDate||
                 !validBloodTypes.Contains(b.BloodType, StringComparer.OrdinalIgnoreCase))
             {
-                return BadRequest("Please enter all the required details.");
+                return BadRequest("Please enter all the required details and ensure all fields data is correct.");
             }
             // Set auto-generated fields
             b.Id = BloodDonors.Any() ? BloodDonors.Max(i => i.Id) + 1 : 1;
